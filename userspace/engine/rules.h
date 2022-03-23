@@ -24,7 +24,6 @@ limitations under the License.
 
 #include "lua_parser.h"
 
-#include "json_evt.h"
 #include "falco_common.h"
 
 class falco_engine;
