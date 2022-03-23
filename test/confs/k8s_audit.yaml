@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021 The Falco Authors.
+# Copyright (C) 2022 The Falco Authors.
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,45 +15,16 @@
 # limitations under the License.
 #
 
-# File(s) or Directories containing Falco rules, loaded at startup.
-# The name "rules_file" is only for backwards compatibility.
-# If the entry is a file, it will be read directly. If the entry is a directory,
-# every file in that directory will be read, in alphabetical order.
 #
-# falco_rules.yaml ships with the falco package and is overridden with
-# every new software version. falco_rules.local.yaml is only created
-# if it doesn't exist. If you want to customize the set of rules, add
-# your customizations to falco_rules.local.yaml.
+# Plugins that are available for use.
 #
-# The files will be read in the order presented here, so make sure if
-# you have overrides they appear in later files.
-rules_file:
-  - /etc/falco/falco_rules.yaml
-  - /etc/falco/falco_rules.local.yaml
-  - /etc/falco/k8s_audit_rules.yaml
-  - /etc/falco/rules.d
-
-
-#
-# Plugins that are available for use. These plugins are not loaded by
-# default, as they require explicit configuration to point to
-# cloudtrail log files.
-#
-
-# To learn more about the supported formats for
-# init_config/open_params for the cloudtrail plugin, see the README at
-# https://github.com/falcosecurity/plugins/blob/master/plugins/cloudtrail/README.md.
 plugins:
   - name: k8saudit
-    library_path: libk8saudit.so
+    library_path: BUILD_DIR/k8saudit-plugin-prefix/src/k8saudit-plugin/libk8saudit.so
     init_config: ""
-    open_params: "https://:9876/k8s-audit"
-  - name: cloudtrail
-    library_path: libcloudtrail.so
-    init_config: ""
-    open_params: ""
+    open_params: "" # to be filled out by each test case
   - name: json
-    library_path: libjson.so
+    library_path: BUILD_DIR/json-plugin-prefix/src/json-plugin/libjson.so
     init_config: ""
 
 # Setting this list to empty ensures that the above plugins are *not*
@@ -61,7 +32,7 @@ plugins:
 # set a meaningful init_config/open_params for the cloudtrail plugin
 # and then change this to:
 # load_plugins: [k8saudit, json]
-load_plugins: []
+load_plugins: [k8saudit, json]
 
 # If true, the times displayed in log messages and output messages
 # will be in ISO 8601. By default, times are displayed in the local
@@ -220,7 +191,7 @@ stdout_output:
 # It also exposes a healthy endpoint that can be used to check if Falco is up and running
 # By default the endpoint is /healthz
 webserver:
-  enabled: true
+  enabled: false
   listen_port: 8765
   k8s_healthz_endpoint: /healthz
   ssl_enabled: false
